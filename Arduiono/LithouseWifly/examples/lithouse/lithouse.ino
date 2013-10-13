@@ -15,8 +15,13 @@ WiFlyClient client;
 LithouseClient litClient ( client, groupId, groupKey, deviceId );
 const int MAX_SIZE = 1;
 LithouseRecord records [MAX_SIZE]; 
+int LED_OUT = 5;
+int fsrPressure = 0;
+int FSR_IN = 0;
+int fsrReading;
 
 void setup() {
+  pinMode(LED_OUT, OUTPUT);
   Serial.begin ( 9600 );
   
   WiFly.begin ( );
@@ -31,17 +36,41 @@ void setup() {
 }
 
 void loop() {
+  downloadLedState ( );
+  uploadFSRState ( );
+  
+  delay ( 1000 );        
+}
+
+void uploadFSRState ( ) {
+  fsrReading = analogRead ( FSR_IN );
+  Serial.print("Analog reading = ");
+  Serial.println(fsrReading);
+  
+  int currentPressure = (fsrReading > 800) ? 80 : 0;  
+  if ( currentPressure != fsrPressure ) {
+    fsrPressure = currentPressure;
+    if ( currentPressure >= 80 ) {
+      records[0].updateRecord (fsrChannel, "80%");
+    } else {
+      records[0].updateRecord (fsrChannel, "0%");
+    }
+    litClient.send ( records, 1 );   
+  }
+}
+
+void downloadLedState ( ) {
   if ( litClient.receive ( records, MAX_SIZE ) == 1 ) {
     records[0].getData (dataRecord );
     
     if ( 0 == strcmp ( dataRecord, "on" ) ) {
-      Serial.println ( "turn led on" );  
+      Serial.println ( "turn led on" );
+      digitalWrite(LED_OUT, HIGH);
     } else {
-      Serial.println ( "turn led off" );  
+      Serial.println ( "turn led off" );
+      digitalWrite ( LED_OUT , LOW );    
     }
-  } 
-
-  delay ( 2000 );
+  }
 }
 
 //bool getBlinkEvent ( ) {
