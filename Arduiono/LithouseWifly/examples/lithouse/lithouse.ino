@@ -9,13 +9,15 @@ char groupKey [] = "83db345d-c34f-40b2-9d27-72f784bb26bc";
 char deviceId [] = "0a894a89-63fd-4687-b096-efe67991da84";
 //char userAgent [] = "User-Agent: Arduino-lib/1.0";
 //char ledChannel [] = "LED1";
-char fsrChannel [] = "FSR1";
-char dataRecord [10];
 WiFlyClient client;
 LithouseClient litClient ( client, groupId, groupKey, deviceId );
 const int MAX_SIZE = 1;
 LithouseRecord records [MAX_SIZE]; 
+
 int LED_OUT = 5;
+
+char fsrChannel [] = "FSR1";
+char dataRecord [10];
 int fsrPressure = 0;
 int FSR_IN = 0;
 int fsrReading;
@@ -51,9 +53,9 @@ void uploadFSRState ( ) {
   if ( currentPressure != fsrPressure ) {
     fsrPressure = currentPressure;
     if ( currentPressure >= 80 ) {
-      records[0].updateRecord (fsrChannel, "80%");
+      records[0].updateRecord (fsrChannel, "80");
     } else {
-      records[0].updateRecord (fsrChannel, "0%");
+      records[0].updateRecord (fsrChannel, "0");
     }
     litClient.send ( records, 1 );   
   }
