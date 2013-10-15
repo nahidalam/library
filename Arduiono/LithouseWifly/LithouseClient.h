@@ -27,7 +27,7 @@ private:
 	static const int MAX_URI_LENGTH = 150;
 	static const int MAX_INPUT_LINE_LENGTH = 300;
 	static const int API_PORT = 80;
-	static const int API_CALL_DELAY = 5000;
+	static const int API_CALL_DELAY = 2000;
 
 	static const char* API_ENDPOINT;
 	static const char* USER_AGENT;
