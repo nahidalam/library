@@ -40,8 +40,12 @@ public class LithouseService {
 		
 		Intent intent = prepareIntent ( callback, groupId ); 
 		intent.putExtra ( INTENT_EXTRA_COMMAND, COMMAND_RECEIVE );
-		intent.putStringArrayListExtra ( INTENT_EXTRA_DEVICE_IDS, new ArrayList < String > ( deviceIds ) );
-		intent.putStringArrayListExtra ( INTENT_EXTRA_CHANNELS, new ArrayList < String > ( channels ) );
+		if ( deviceIds != null ) {
+			intent.putStringArrayListExtra ( INTENT_EXTRA_DEVICE_IDS, new ArrayList < String > ( deviceIds ) );
+		}
+		if ( channels != null ) {
+			intent.putStringArrayListExtra ( INTENT_EXTRA_CHANNELS, new ArrayList < String > ( channels ) );
+		}
 		
 		context.startService ( intent );    
 	}
