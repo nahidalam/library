@@ -115,22 +115,26 @@ class HttpHelper {
 		ArrayList < Record > records = new ArrayList < Record > ( );
 		
 		if ( jsonResult != null ) {
+			JSONArray jsonRecords;
 			try {
-				JSONArray jsonRecords = jsonResult.getJSONArray ( "records" );
-				
-				if ( jsonRecords != null ) {
-					for ( int i =0; i < jsonRecords.length ( ); i++ ) {
-						JSONObject jsonRecord = jsonRecords.getJSONObject ( i );
-						records.add ( new Record ( 
-								jsonRecord.getString ( "deviceId" ),
-								jsonRecord.getString ( "channel" ),
-								jsonRecord.getString ( "data" ),
-								jsonRecord.getString ( "timestamp" )));
-					}
-				} 
+				jsonRecords = jsonResult.getJSONArray ( "records" );
 			} catch ( JSONException e ) {
 				Log.e ( DEBUG_TAG, e.getMessage ( ) );
+				return records;
 			}
+			
+			for ( int i = 0; i < jsonRecords.length ( ); i++ ) {
+				try {
+					JSONObject jsonRecord = jsonRecords.getJSONObject ( i );
+					records.add ( new Record ( 
+							jsonRecord.getString ( "deviceId" ),
+							jsonRecord.getString ( "channel" ),
+							jsonRecord.getString ( "data" ),
+							jsonRecord.getString ( "timestamp" )));
+				} catch ( JSONException e ) {
+					Log.e ( DEBUG_TAG, e.getMessage ( ) );
+				}
+			}	 
 		}
 		
 		return records;
