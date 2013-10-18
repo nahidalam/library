@@ -81,9 +81,9 @@ class HttpHelper {
 				
 		HttpEntity entity = response.getEntity ( );
 		if ( entity != null ) {
-            String retSrc = EntityUtils.toString ( entity );
-            Log.d ( DEBUG_TAG, retSrc );
-            httpReturn = new JSONObject ( retSrc );
+			String returnString = EntityUtils.toString ( entity );
+			Log.d ( DEBUG_TAG, returnString );
+			httpReturn = new JSONObject ( returnString );
         } else {
         	throw new LithouseClientException ( "server failed to respond" );
         }
