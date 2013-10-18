@@ -7,6 +7,7 @@ public class Record implements Parcelable {
 	private final String deviceId;
 	private final String channel;
 	private final String data;
+	private final String timestamp;
 	
 	public static final Parcelable.Creator < Record > CREATOR = new Parcelable.Creator < Record > ( ) {
         public Record createFromParcel ( Parcel in ) {
@@ -18,16 +19,22 @@ public class Record implements Parcelable {
         }
     };
 	
-    public Record ( String deviceId, String channel, String data ) {
+    public Record ( String deviceId, String channel, String data, String timestamp ) {
     	this.deviceId = deviceId;
     	this.channel = channel;
     	this.data = data;
+    	this.timestamp = timestamp;
+    }
+    
+    public Record ( String deviceId, String channel, String data ) {
+    	this ( deviceId, channel, data, null );
     }
     
     public Record ( Parcel in ) {
     	deviceId = in.readString ( );
     	channel = in.readString ( );
     	data = in.readString ( );
+    	timestamp = in.readString ( );
     }
 
 	public String getDeviceId () {
@@ -39,6 +46,9 @@ public class Record implements Parcelable {
 	public String getData () {
 		return data;
 	}
+	public String getTimestamp () {
+		return timestamp;
+	}
 		
 	@Override
 	public int describeContents () {
@@ -48,7 +58,8 @@ public class Record implements Parcelable {
 	public void writeToParcel ( Parcel out, int flag ) {
 		out.writeString ( deviceId );
 		out.writeString ( channel );
-		out.writeString ( data );		
+		out.writeString ( data );
+		out.writeString ( timestamp );
 	}
 	
 	@Override

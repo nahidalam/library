@@ -13,7 +13,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.app.Activity;
-import android.content.Intent;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -31,8 +30,10 @@ public class MainActivity extends Activity {
 	private final LithouseService mLithouseService = new LithouseService ( this, appKey );	
 	
 	private EditText editTextSend;
-	private LithouseService.Receiver mSendCallback = new LithouseService.Receiver () {
-
+	private TextView textViewReceive;
+	
+	private LithouseService.Callback mSendCallback = new LithouseService.Callback( ) {
+		
 		@Override
 		public void onSuccess ( List < Record > results ) {
 			Log.d ( DEBUG_TAG, "records sent to server" );
@@ -40,12 +41,34 @@ public class MainActivity extends Activity {
 		}
 
 		@Override
-		public void onFailure ( Exception e ) {
-			Log.e ( DEBUG_TAG, e.toString ( ) );
+		public void onFailure ( Throwable t ) {
+			Log.e ( DEBUG_TAG, t.getMessage ( ) );
 			Toast.makeText ( MainActivity.this, "failed to send data", Toast.LENGTH_LONG ).show ( );
 		}
+
+	};
+	
+	private LithouseService.Callback mReceiveCallback = new LithouseService.Callback( ) {
 		
-	}; 
+		@Override
+		public void onSuccess ( List < Record > results ) {
+			Log.d ( DEBUG_TAG, "records received from server" );
+			Toast.makeText ( MainActivity.this, results.size ( ) + " record received", Toast.LENGTH_LONG ).show ( );
+			
+			//since we are targeting a channel of a unique device 
+			if ( results.size ( ) == 1 ) {
+				textViewReceive.setText ( results.get ( 0 ).getData ( ) );
+			}
+		}
+
+		@Override
+		public void onFailure ( Throwable t ) {
+			Log.e ( DEBUG_TAG, t.getMessage ( ) );
+			Toast.makeText ( MainActivity.this, "failed to receive data", Toast.LENGTH_LONG ).show ( );
+		}
+
+	};  
+
 	
 	@Override
 	protected void onCreate ( Bundle savedInstanceState ) {
@@ -74,10 +97,16 @@ public class MainActivity extends Activity {
 			public void onClick ( View arg0 ) {				
 				Log.d ( DEBUG_TAG, "receive button clicked" );
 				
+				mLithouseService.receive ( mReceiveCallback, groupId, Arrays.asList ( deviceId ), Arrays.asList ( receiveChannel ) );
+				//mLithouseService.receive ( mReceiveCallback, groupId, null, null );
+				//mLithouseService.receive ( mReceiveCallback, groupId, Arrays.asList ( deviceId ), null );
+				//mLithouseService.receive ( mReceiveCallback, groupId, null, Arrays.asList ( receiveChannel ) );
+				
 			}
 		} );
 		
 		editTextSend = ( EditText ) findViewById ( R.id.editTextSend );
+		textViewReceive = ( TextView ) findViewById ( R.id.textViewReceive );
 	}
 
 	@Override
@@ -90,7 +119,7 @@ public class MainActivity extends Activity {
 	@Override
     public void onPause() {
 		super.onPause();
-		mLithouseService.stopAllReceivers ( );
+		mLithouseService.removeAllCallbacks ( );
     }
 	
 }

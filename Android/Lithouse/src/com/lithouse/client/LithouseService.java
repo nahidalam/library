@@ -15,53 +15,81 @@ import static com.lithouse.client.Constants.*;
 
 public class LithouseService {
 	
+	public interface Callback {
+		public void onSuccess ( List < Record > results );
+		public void onFailure ( Throwable t );
+	}
+	
 	private final String appKey;
 	private final Context context;
-	private Map < Receiver, LithouseResultReceiver > sendReceivers 
-		= new HashMap < LithouseService.Receiver, LithouseResultReceiver > (  );  
+	private Map < Callback, LithouseResultReceiver > receiverMap 
+		= new HashMap < Callback, LithouseResultReceiver > (  );  
 	
 	public LithouseService ( Context context, String appKey ) {
+		if ( appKey == null || appKey.isEmpty ( ) ) {
+			throw new IllegalArgumentException ( "missing appKey" );
+		}
+		
 		this.context = context;
 		this.appKey = appKey;
 	}
 	
-	public void send ( Receiver receiver, String groupId, ArrayList < Record > records ) {
+	public void receive ( Callback callback, String groupId, 
+						  List < String > deviceIds, List < String > channels ) {
+		Log.d ( DEBUG_TAG, "receive ( )" );
+		
+		Intent intent = prepareIntent ( callback, groupId ); 
+		intent.putExtra ( INTENT_EXTRA_COMMAND, COMMAND_RECEIVE );
+		intent.putStringArrayListExtra ( INTENT_EXTRA_DEVICE_IDS, new ArrayList < String > ( deviceIds ) );
+		intent.putStringArrayListExtra ( INTENT_EXTRA_CHANNELS, new ArrayList < String > ( channels ) );
+		
+		context.startService ( intent );    
+	}
+	
+	public void send ( Callback callback, String groupId, ArrayList < Record > records ) {
 		Log.d ( DEBUG_TAG, "send ( )" );
 		
-		final Intent intent = new Intent ( Intent.ACTION_SYNC, null, context, LithouseRESTService.class );
+		if ( records == null || records.isEmpty ( ) ) {
+			throw new IllegalArgumentException ( "missing record list" );			
+		}
+		
+		Intent intent = prepareIntent ( callback, groupId ); 
+		intent.putExtra ( INTENT_EXTRA_COMMAND, COMMAND_SEND );
+		intent.putParcelableArrayListExtra ( INTENT_EXTRA_RECORDS, records );
+		
+		context.startService ( intent );    
+	}
+
+	public void removeAllCallbacks ( ) {
+		for ( LithouseResultReceiver receiver : receiverMap.values ( ) ) {
+			receiver.removeCallback ( );
+		}
+	}
+	
+	private Intent prepareIntent ( Callback callback, String groupId ) {
+		if ( groupId == null || groupId.isEmpty ( ) ) {
+			throw new IllegalArgumentException ( "missing groupId" );
+		}
+		
+		Intent intent = new Intent ( Intent.ACTION_SYNC, null, context, LithouseRESTService.class );
 	 	
 		intent.putExtra ( INTENT_EXTRA_APP_KEY, appKey ) ;
 		intent.putExtra ( INTENT_EXTRA_GROUP_ID, groupId ) ;
-		intent.putExtra ( INTENT_EXTRA_RECEIVER, getLithouseReceiver ( sendReceivers, receiver )  );
-		intent.putParcelableArrayListExtra ( INTENT_EXTRA_RECORDS, records );
-		//intent.putExtra("command", "query");
-	    context.startService ( intent );    
-	}
-
-	public void stopAllReceivers ( ) {
-		stopAllReceivers ( sendReceivers );
-	}
-	
-	private void stopAllReceivers ( Map < Receiver, LithouseResultReceiver > sendReceivers ) {
-		for ( LithouseResultReceiver receiver : sendReceivers.values ( ) ) {
-			receiver.setReceiver ( null );
+		if ( callback != null ) {
+			intent.putExtra ( INTENT_EXTRA_RECEIVER, getLithouseReceiver ( callback )  );
 		}
+		
+		return intent;
 	}
 	
-	private LithouseResultReceiver getLithouseReceiver ( 
-			Map < Receiver, LithouseResultReceiver > receivers, Receiver receiver ) {
-		LithouseResultReceiver lithouseReceiver = receivers.get ( receiver );
+	private LithouseResultReceiver getLithouseReceiver ( Callback callback ) {
+		LithouseResultReceiver lithouseReceiver = receiverMap.get ( callback );
 		
 		if ( lithouseReceiver == null ) {
-			lithouseReceiver = new LithouseResultReceiver ( new Handler ( ), receiver );			
-			receivers.put ( receiver, lithouseReceiver );
+			lithouseReceiver = new LithouseResultReceiver ( new Handler ( ), callback );			
+			receiverMap.put ( callback, lithouseReceiver );
 		}
 		
 		return lithouseReceiver;
-	}
-	
-	public interface Receiver {
-		public void onSuccess ( List < Record > results );
-		public void onFailure ( Exception e );
 	}
 }

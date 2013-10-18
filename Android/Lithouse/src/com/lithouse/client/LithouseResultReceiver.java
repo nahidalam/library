@@ -2,7 +2,8 @@ package com.lithouse.client;
 
 import java.util.List;
 
-import com.lithouse.client.LithouseService.Receiver;
+import com.lithouse.client.LithouseService.Callback;
+import com.lithouse.client.exception.LithouseClientException;
 import com.lithouse.client.model.Record;
 
 import android.content.Intent;
@@ -13,38 +14,41 @@ import static com.lithouse.client.Constants.*;
 
 class LithouseResultReceiver extends ResultReceiver {
 
-	private Receiver mReceiver;
+	private Callback callback;
 	
-	public LithouseResultReceiver ( Handler handler, Receiver receiver ) {
+	public LithouseResultReceiver ( Handler handler, Callback callback ) {
 		super ( handler );
-		this.mReceiver = receiver;
+		this.callback = callback;
 	}
 	
-	public void setReceiver ( Receiver receiver ) {
-        mReceiver = receiver;
-    }
+	public void removeCallback ( ) {
+		callback = null;
+	}
 
-	private Exception prepareException ( Bundle resultData ) {
+	private Throwable prepareException ( Bundle resultData ) {
 		int errorType = resultData.getInt ( INTENT_EXTRA_ERROR_TYPE );
 		String errorMessage = resultData.getString ( Intent.EXTRA_TEXT );	
 		
 		if ( errorType == ERROR_ILLEGAL_ARGUMENT ) {
 			return new IllegalArgumentException ( errorMessage );
+		} else if ( errorType == ERROR_LITHOUSE_CLIENT ) {
+			return new LithouseClientException ( errorMessage );
 		}
+		
 		return new Exception ( "Internal error" );
 	}
 	
 	@Override
     protected void onReceiveResult ( int resultCode, Bundle resultData ) {
-        if (mReceiver != null) {
+        if ( callback != null ) {
         	
         	if ( resultCode == STATUS_ERROR ) {
-        		mReceiver.onFailure ( prepareException ( resultData ) );
+        		callback.onFailure ( prepareException ( resultData ) );
         	} else if ( resultCode == STATUS_RUNNING ) {
-        		//mReceiver.onReceiveResult ( resultCode, null, null );
+        		//callback.onReceiveResult ( resultCode, null, null );
         	} else if ( resultCode == STATUS_FINISHED ) {
         		List < Record > records = resultData.getParcelableArrayList ( INTENT_EXTRA_RECORDS );
-        		mReceiver.onSuccess ( records );
+        		callback.onSuccess ( records );
         	}
              
         }
