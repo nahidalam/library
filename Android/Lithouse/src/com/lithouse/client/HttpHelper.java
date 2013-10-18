@@ -97,6 +97,8 @@ class HttpHelper {
 	}
 	
 	private static String serializeRecordsToJSON ( List < Record > records ) {
+		if ( records == null || records.isEmpty ( )) return "{}";
+		
 		StringBuilder result = new StringBuilder ( ); 
 		result.append ( "{\"records\":[" );
 		result.append ( records.get ( 0 ).toString ( ) );
