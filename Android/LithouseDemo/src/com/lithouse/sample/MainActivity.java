@@ -19,13 +19,13 @@ import android.view.View;
 
 public class MainActivity extends Activity {
 	private static final String DEBUG_TAG = "DEMO";
-	private final String appKey = "4e6f08f3-6b11-4fd3-bea5-f76081820b8c";
+	private final String appKey = "4008432b-ca6c-4be6-975d-89f3811cbcb7";
 	//You may target different groups, devices and channels in different send/receive calls;
-	private final String groupId = "1655c124-c3a7-4303-b28f-081594545eb4";
-	private final String deviceId = "0a894a89-63fd-4687-b096-efe67991da84";
+	private final String groupId = "cf31a31b-4425-4538-a0ca-0e7ac3bf0ac5";
+	private final String deviceId = "782fb917-1a4b-4afd-922a-3354760758c3";
 	
-	private final String sendChannel = "LED1";
-	private final String receiveChannel = "FSR1";
+	private final String sendChannel = "LED";
+	private final String receiveChannel = "FSR";
 	
 	private final LithouseService mLithouseService = new LithouseService ( this, appKey );	
 	
