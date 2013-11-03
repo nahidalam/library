@@ -8,7 +8,7 @@
 class LithouseClient
 {
 public:
-	LithouseClient ( Client& client, const char* groupId, const char* groupKey, const char* deviceId );
+	LithouseClient ( Client& client, const char* deviceKey );
 	
 	int receive ( LithouseRecord records [], int MAX_SIZE );
 	int send ( LithouseRecord records [], int recordCount );
@@ -20,11 +20,8 @@ private:
 	char* extractNextJSONValue ( const char* jsonString, char* value );
 
 	Client& _client;
-	/*const char* _groupId;
-	const char* _groupKey;
-	const char* _deviceId;*/
-
-	static const int MAX_URI_LENGTH = 150;
+	
+	static const int MAX_URI_LENGTH = 75;
 	static const int MAX_INPUT_LINE_LENGTH = 300;
 	static const int API_PORT = 80;
 	static const int API_CALL_DELAY = 2000;

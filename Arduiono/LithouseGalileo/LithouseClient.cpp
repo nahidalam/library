@@ -5,15 +5,11 @@ const char* LithouseClient::API_ENDPOINT = "alpha-api.elasticbeanstalk.com";
 const char* LithouseClient::USER_AGENT = "User-Agent: Arduino-lib/1.0";
 const char* LithouseClient::CONTENT_TYPE = "Content-Type: application/json";
 
-LithouseClient::LithouseClient ( Client&_client, const char* groupId, const char* groupKey, const char* deviceId )
+LithouseClient::LithouseClient ( Client&_client, const char* deviceKey )
 		: _client (_client )
 {
-	strcpy ( _apiUri, "/v1/groups/" );
-	strcat ( _apiUri, groupId );
-	strcat ( _apiUri, "/records/" );
-	strcat ( _apiUri, deviceId );
-	strcat ( _apiUri, "?groupKey=" );
-	strcat ( _apiUri, groupKey );
+	strcpy ( _apiUri, "/v1/records?deviceKey=" );
+	strcat ( _apiUri, deviceKey );
 	strcat ( _apiUri, " HTTP/1.0" );
 }
 
@@ -82,7 +78,7 @@ int LithouseClient::readLine ( ) {
 		if ( character != '\r' && character != -1 ) {
 			if ( (currentLength + 1) == MAX_INPUT_LINE_LENGTH ) {
 				break;
-			}
+			}			
 			_requestBodyBuffer [ currentLength++ ] = character;
 		} 
 	}
