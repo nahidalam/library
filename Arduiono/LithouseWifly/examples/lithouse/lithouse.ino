@@ -17,6 +17,7 @@ char dataRecord [10];
 int fsrPressure = 0;
 int FSR_IN = 0;
 int fsrReading;
+char fsrBuffer[5];
 
 void setup() {
   pinMode(LED_OUT, OUTPUT);
@@ -45,14 +46,12 @@ void uploadFSRState ( ) {
   Serial.print("Analog reading = ");
   Serial.println(fsrReading);
   
-  int currentPressure = (fsrReading > 800) ? 80 : 0;  
+  int currentPressure = (fsrReading > 800) ? (fsrReading/10) : 0;
+  currentPressure = (currentPressure < 100) ? currentPressure : 99;
   if ( currentPressure != fsrPressure ) {
-    fsrPressure = currentPressure;
-    if ( currentPressure >= 80 ) {
-      records[0].updateRecord (fsrChannel, "80");
-    } else {
-      records[0].updateRecord (fsrChannel, "0");
-    }
+    fsrPressure = currentPressure; 
+    itoa ( fsrPressure, fsrBuffer, 10 );
+    records[0].updateRecord (fsrChannel, fsrBuffer );
     litClient.send ( records, 1 );   
   }
 }
