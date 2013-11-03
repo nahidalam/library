@@ -21,7 +21,7 @@ private:
 
 	WiFlyClient& _client;
 
-	static const int MAX_URI_LENGTH = 65;
+	static const int MAX_URI_LENGTH = 75;
 	static const int MAX_INPUT_LINE_LENGTH = 300;
 	static const int API_PORT = 80;
 	static const int API_CALL_DELAY = 2000;
