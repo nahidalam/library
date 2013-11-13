@@ -1,9 +1,9 @@
 /*
- Lithouse Ethernet client 
+ Lithouse WiFi client 
  
  This sketch connects to api.lithouse.co through LithouseClient.
- It expects “on” or “off” command on incoming “LED” channel. 
- And, uploads normalized analog readings to “FSR” channel.  
+ It expects "on" or "off" command on incoming "LED" channel. 
+ And, uploads normalized analog readings to "FSR" channel.  
  
  Circuit:
  * Described in getting started with Arduino tutorial in lithouse.co.
@@ -14,13 +14,13 @@
  */
 
 #include <SPI.h>
-#include <Ethernet.h>
+#include <WiFi.h>
 #include <Lithouse.h>
 
-// Enter a MAC address for your controller below.
-// Newer Ethernet shields have a MAC address printed on a sticker on the shield
-byte mac[] = { 0x00, 0x13, 0x20, 0xFF, 0x16, 0x7E };
-EthernetClient client;
+char ssid[] = "YOUR_SSID";
+char pass[] = "YOUR_NETWORK_PASSWORD";
+WiFiClient client;
+int status = WL_IDLE_STATUS;
 
 //Copy deviceKey from Lithouse portal
 char deviceKey [] = "a28e6923-3cf5-4ba1-ad35-358df76cbd6a";
@@ -51,16 +51,23 @@ void setup() {
     ; // wait for serial port to connect. Needed for Leonardo only
   }
   
-  Serial.println("connecting...to ethernet");  
-  // Start the Ethernet connection
-  if (Ethernet.begin(mac) == 0) {
-    Serial.println("Failed to configure Ethernet using DHCP");
-    while ( 1 ) {
-      // Hang on failure  
-    }    
-  }
-  // Give the Ethernet shield a second to initialize
-  delay ( 1000 );
+  // check for the presence of the shield:
+  if (WiFi.status() == WL_NO_SHIELD) {
+    Serial.println("WiFi shield not present"); 
+    // don't continue:
+    while(true);
+  } 
+  
+  // attempt to connect to Wifi network:
+  while (status != WL_CONNECTED) { 
+    Serial.print("Attempting to connect to SSID: ");
+    Serial.println(ssid);
+    // Connect to WPA/WPA2 network. Change this line if using open or WEP network:    
+    status = WiFi.begin(ssid, pass);
+  
+    // wait 10 seconds for connection:
+    delay(10000);
+  } 
   Serial.println("connecting...to lithouse");  
 }
 
