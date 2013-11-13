@@ -10,12 +10,12 @@ class LithouseRecord : public Printable {
 public:
 	LithouseRecord ( );
 	LithouseRecord ( const char* channel, const char*  data );
-	//void getChannel ( char* channel );
+	void getChannel ( char* channel );
 	void getData ( char* data );
 	//void getTimestamp ( char* timestamp );
 
 	void updateRecord ( const char* channel, const char*  data );
-	void concatRecord ( char* buffer, int MAX_SIZE );
+	int concatRecord(char* buffer, int MAX_SIZE);
 	virtual size_t printTo ( Print& print) const;
 private:
 	

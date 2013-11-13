@@ -10,27 +10,29 @@ class LithouseClient
 public:
 	LithouseClient ( Client& client, const char* deviceKey );
 	
-	int receive ( LithouseRecord records [], int MAX_SIZE );
+	int receive(LithouseRecord records[], int MAX_RECORD_COUNT);
 	int send ( LithouseRecord records [], int recordCount );
 
 private:
 	int readLine ( );
-	void createRequestBody ( LithouseRecord records [], int recordCount );
-	int parseResponseBody ( LithouseRecord records [], int MAX_SIZE );
+	int createRequestBody(LithouseRecord records[], int recordCount);
+	int parseResponseBody(LithouseRecord records[], int MAX_RECORD_COUNT);
 	char* extractNextJSONValue ( const char* jsonString, char* value );
 
 	Client& _client;
-	
+
 	static const int MAX_URI_LENGTH = 75;
-	static const int MAX_INPUT_LINE_LENGTH = 300;
+	//Maximum length of a HTTP request line
+	static const int MAX_REQUEST_LINE_LENGTH = 300;
 	static const int API_PORT = 80;
-	static const int API_CALL_DELAY = 2000;
+	//Delay between individual read and write calls
+	static const int API_CALL_DELAY = 4000;
 
 	static const char* API_ENDPOINT;
 	static const char* USER_AGENT;
 	static const char* CONTENT_TYPE;
 	char _apiUri [MAX_URI_LENGTH];
-	char _requestBodyBuffer [MAX_INPUT_LINE_LENGTH];
+	char _requestBodyBuffer [MAX_REQUEST_LINE_LENGTH];
 };
 
 
