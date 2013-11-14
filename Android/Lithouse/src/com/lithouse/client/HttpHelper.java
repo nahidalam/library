@@ -28,11 +28,11 @@ import com.lithouse.client.exception.LithouseClientException;
 import com.lithouse.client.model.Record;
 
 class HttpHelper {
-	private static final String apiEndpoint = "http://alpha-api.elasticbeanstalk.com/v1/groups/";
+	private static final String apiEndpoint = "http://api.lithouse.co/v1/groups/";
 	private static final int CONNECTION_TIMEOUT = 10000;
 	
-	private static String buildUri ( String appKey, String groupId ) {
-		String uri = apiEndpoint + groupId + "/records?appKey=" + appKey;
+	private static String buildUri ( String groupId ) {
+		String uri = apiEndpoint + groupId + "/records";
 		Log.d ( DEBUG_TAG, uri );
 		return uri; 
 	}
@@ -43,8 +43,9 @@ class HttpHelper {
 			throw new LithouseClientException ( "missing record list" );			
 		}
 		
-		HttpPost httpPost = new HttpPost ( buildUri ( appKey, groupId ) );
-	    	    
+		HttpPost httpPost = new HttpPost ( buildUri ( groupId ) );
+	    
+		httpPost.setHeader ( "appKey", appKey );
 	    httpPost.setHeader ( "Content-type", "application/json" );
 	    httpPost.setEntity ( new StringEntity ( serializeRecordsToJSON ( records ) ));
 
@@ -55,24 +56,41 @@ class HttpHelper {
 					List < String > deviceIds, List < String > channels ) 
 							throws ParseException, ClientProtocolException, IOException, JSONException {
 		
-		StringBuilder uri = new StringBuilder ( buildUri ( appKey, groupId ) );
+		StringBuilder uri = new StringBuilder ( buildUri ( groupId ) );
+		
+		boolean isFirst = true;
 		
 		if ( deviceIds != null && !deviceIds.isEmpty ( ) ) {
 			for ( String deviceId : deviceIds ) {
-				uri.append ( "&deviceId=" );
+				if ( isFirst ) {
+					uri.append ( "?deviceId=" );
+					isFirst = false;
+				} else {
+					uri.append ( "&deviceId=" );
+				}
+				
 				uri.append ( deviceId );
 			}
 		}
 		
 		if ( channels != null && !channels.isEmpty ( ) ) {
 			for ( String channel : channels ) {
-				uri.append ( "&channel=" );
+				if ( isFirst ) {
+					uri.append ( "?channel=" );
+					isFirst = false;
+				} else {
+					uri.append ( "&channel=" );
+				}
+				
 				uri.append ( channel );
 			}
 		}
 		
+		HttpGet httpGet = new HttpGet ( uri.toString ( ) );
+		httpGet.setHeader ( "appKey", appKey );
+		
 	    return deSerializeJSONToReocrds ( convertHttpResponseToJSON ( 
-	    			getHttpClient ( ).execute ( new HttpGet ( uri.toString ( )))));
+	    			getHttpClient ( ).execute ( httpGet )));
 	}
 	
 	private static JSONObject convertHttpResponseToJSON ( HttpResponse response ) 

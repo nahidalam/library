@@ -19,7 +19,7 @@
 
 // Enter a MAC address for your controller below.
 // Newer Ethernet shields have a MAC address printed on a sticker on the shield
-byte mac[] = { 0x00, 0x13, 0x20, 0xFF, 0x16, 0x7E };
+byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 EthernetClient client;
 
 //Copy deviceKey from Lithouse portal

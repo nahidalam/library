@@ -21,7 +21,7 @@ private:
 
 	Client& _client;
 
-	static const int MAX_URI_LENGTH = 75;
+	static const int MAX_DEVICE_KEY_LENGTH = 40;
 	//Maximum length of a HTTP request line
 	static const int MAX_REQUEST_LINE_LENGTH = 300;
 	static const int API_PORT = 80;
@@ -29,9 +29,10 @@ private:
 	static const int API_CALL_DELAY = 4000;
 
 	static const char* API_ENDPOINT;
+	static const char* API_URI;
 	static const char* USER_AGENT;
 	static const char* CONTENT_TYPE;
-	char _apiUri [MAX_URI_LENGTH];
+	char _deviceKey [MAX_DEVICE_KEY_LENGTH];
 	char _requestBodyBuffer [MAX_REQUEST_LINE_LENGTH];
 };
 

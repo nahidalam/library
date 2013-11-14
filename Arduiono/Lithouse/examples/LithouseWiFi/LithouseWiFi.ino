@@ -23,7 +23,7 @@ WiFiClient client;
 int status = WL_IDLE_STATUS;
 
 //Copy deviceKey from Lithouse portal
-char deviceKey [] = "a28e6923-3cf5-4ba1-ad35-358df76cbd6a";
+char deviceKey [] = "YOUR_DEVICE_KEY";
 //Incoming channel
 char ledChannel [] = "LED";
 //Outgoing channel
