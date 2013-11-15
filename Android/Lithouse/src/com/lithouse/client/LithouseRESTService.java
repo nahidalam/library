@@ -1,6 +1,7 @@
 package com.lithouse.client;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.http.ParseException;
@@ -50,7 +51,7 @@ public class LithouseRESTService extends IntentService {
 		try {
 			if ( command == COMMAND_SEND ) {
 				
-				List < Record > records = intent.getParcelableArrayListExtra ( INTENT_EXTRA_RECORDS );
+				ArrayList < Record > records = intent.getParcelableArrayListExtra ( INTENT_EXTRA_RECORDS );
 				send ( records, appKey, groupId, receiver ); 
 			
 			} else if ( command == COMMAND_RECEIVE ) {
@@ -72,12 +73,12 @@ public class LithouseRESTService extends IntentService {
 		Log.d ( DEBUG_TAG, "service stopping");
 	}
 	
-	private void send ( List < Record > records, String appKey, String groupId, ResultReceiver receiver ) 
+	private void send ( ArrayList < Record > records, String appKey, String groupId, ResultReceiver receiver ) 
 			throws ClientProtocolException, ParseException, IOException, JSONException {
 		HttpHelper.send ( records, appKey, groupId );
 		
 		if ( receiver != null ) {
-			receiver.send ( STATUS_FINISHED, Bundle.EMPTY );
+			receiver.send ( STATUS_FINISHED, createBundleFromRecords ( records ) );
 		}
 	}
 	
@@ -86,11 +87,9 @@ public class LithouseRESTService extends IntentService {
 		
 		if ( receiver == null ) return;
 		
-		Bundle bundle = new Bundle ( );		
-		bundle.putParcelableArrayList ( INTENT_EXTRA_RECORDS, 
-				HttpHelper.receive ( appKey, groupId, deviceIds, channels ) );
-		
-		receiver.send ( STATUS_FINISHED, bundle );
+		receiver.send ( 
+				STATUS_FINISHED, 
+				createBundleFromRecords ( HttpHelper.receive ( appKey, groupId, deviceIds, channels )) );
 	}
 	
 	private void sendError ( ResultReceiver receiver, int errorType, String errorMessage ) {
@@ -102,5 +101,12 @@ public class LithouseRESTService extends IntentService {
 		Log.e ( DEBUG_TAG, errorMessage );
 		
 		receiver.send ( STATUS_ERROR, bundle );
+	}
+	
+	private Bundle createBundleFromRecords ( ArrayList < Record > records ) {
+		Bundle bundle = new Bundle ( );		
+		bundle.putParcelableArrayList ( INTENT_EXTRA_RECORDS, records );
+		
+		return bundle;
 	}
 }

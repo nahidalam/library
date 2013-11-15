@@ -19,19 +19,22 @@ import android.view.View;
 
 public class MainActivity extends Activity {
 	private static final String DEBUG_TAG = "DEMO";
-	private final String appKey = "4008432b-ca6c-4be6-975d-89f3811cbcb7";
-	//You may target different groups, devices and channels in different send/receive calls;
-	private final String groupId = "cf31a31b-4425-4538-a0ca-0e7ac3bf0ac5";
-	private final String deviceId = "782fb917-1a4b-4afd-922a-3354760758c3";
+	//appKey, groupId and deviceId can be retrieved from http://lithouse.co
+	private final String appKey = "YOUR_APP_KEY";
+	//You may target different groups, devices and channels in different send and receive calls;
+	private final String groupId = "TARGET_GROUP_ID";
+	private final String deviceId = "TARGET_DEVICE_ID";
 	
 	private final String sendChannel = "LED";
 	private final String receiveChannel = "FSR";
 	
+	//Initialize the Lithouse service handler
 	private final LithouseService mLithouseService = new LithouseService ( this, appKey );	
 	
 	private EditText editTextSend;
 	private TextView textViewReceive;
 	
+	//Callback for 'send' api call
 	private LithouseService.Callback mSendCallback = new LithouseService.Callback( ) {
 		
 		@Override
@@ -48,6 +51,7 @@ public class MainActivity extends Activity {
 
 	};
 	
+	//Callback for 'receive' api call
 	private LithouseService.Callback mReceiveCallback = new LithouseService.Callback( ) {
 		
 		@Override
@@ -98,8 +102,12 @@ public class MainActivity extends Activity {
 				Log.d ( DEBUG_TAG, "receive button clicked" );
 				
 				mLithouseService.receive ( mReceiveCallback, groupId, Arrays.asList ( deviceId ), Arrays.asList ( receiveChannel ) );
+				//Possible usages
+				//All records from all devices of this group
 				//mLithouseService.receive ( mReceiveCallback, groupId, null, null );
+				//All records from all channels of this device
 				//mLithouseService.receive ( mReceiveCallback, groupId, Arrays.asList ( deviceId ), null );
+				//All records from different device with the same channel name
 				//mLithouseService.receive ( mReceiveCallback, groupId, null, Arrays.asList ( receiveChannel ) );
 				
 			}
