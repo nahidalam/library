@@ -5,12 +5,12 @@
 
 char deviceKey [] = "a28e6923-3cf5-4ba1-ad35-358df76cbd6a";
 //char ledChannel [] = "LED";
-WiFlyClient client;
+WiFlyClient  client;
 LithouseClient litClient ( client, deviceKey );
 const int MAX_SIZE = 1;
 LithouseRecord records [MAX_SIZE]; 
 
-int LED_OUT = 5;
+int LED_OUT = 7;
 
 char fsrChannel [] = "FSR";
 char dataRecord [10];
@@ -21,6 +21,7 @@ char fsrBuffer[5];
 
 void setup() {
   pinMode(LED_OUT, OUTPUT);
+  
   Serial.begin ( 9600 );
   
   WiFly.begin ( );
@@ -32,6 +33,8 @@ void setup() {
     }
   }  
   Serial.println ( "Connected to wifi" );
+  
+  delay ( 10000 );
 }
 
 void loop() {
@@ -46,7 +49,7 @@ void uploadFSRState ( ) {
   Serial.print("Analog reading = ");
   Serial.println(fsrReading);
   
-  int currentPressure = (fsrReading > 800) ? (fsrReading/10) : 0;
+  int currentPressure = (fsrReading > 700) ? (fsrReading/10) : 0;
   currentPressure = (currentPressure < 100) ? currentPressure : 99;
   if ( currentPressure != fsrPressure ) {
     fsrPressure = currentPressure; 
