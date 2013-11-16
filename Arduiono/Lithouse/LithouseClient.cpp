@@ -6,8 +6,8 @@ const char* LithouseClient::API_URI = "/v1/records HTTP/1.0";
 const char* LithouseClient::USER_AGENT = "User-Agent: Arduino-lib/1.0";
 const char* LithouseClient::CONTENT_TYPE = "Content-Type: application/json";
 
-LithouseClient::LithouseClient(Client&_client, const char* deviceKey)
-: _client(_client)
+LithouseClient::LithouseClient(Client& client, const char* deviceKey)
+: _client(client)
 {
 	strcpy ( _deviceKey, deviceKey );
 }
@@ -18,7 +18,7 @@ int LithouseClient::send(LithouseRecord records[], int recordCount) {
 	}
 
 	if (_client.connect(API_ENDPOINT, API_PORT)) {
-		Serial.println("Writing to Lithouse");
+		//Serial.println("Writing to Lithouse");
 
 		int result = createRequestBody(records, recordCount);
 		if (result < 0) {
@@ -52,7 +52,7 @@ int LithouseClient::send(LithouseRecord records[], int recordCount) {
 
 int LithouseClient::receive(LithouseRecord records[], int MAX_RECORD_COUNT) {
 	if (_client.connect(API_ENDPOINT, API_PORT)) {
-		Serial.println("Reading from Lithouse");
+		//Serial.println("Reading from Lithouse");
 		_client.print("GET ");
 		_client.println ( API_URI );
 		_client.print("deviceKey: ");
@@ -73,7 +73,7 @@ int LithouseClient::receive(LithouseRecord records[], int MAX_RECORD_COUNT) {
 		}
 
 	}
-	Serial.println(_requestBodyBuffer);
+	//Serial.println(_requestBodyBuffer);
 
 	_client.stop();
 	delay(API_CALL_DELAY);
@@ -135,7 +135,7 @@ int LithouseClient::createRequestBody(LithouseRecord records[], int recordCount)
 	}
 	strcat(_requestBodyBuffer, "]}");
 
-	Serial.println(_requestBodyBuffer);
+	//Serial.println(_requestBodyBuffer);
 
 	return Constants::SUCCESS;
 }
